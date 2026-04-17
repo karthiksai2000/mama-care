@@ -10,6 +10,7 @@ import axios from 'axios';
 // Environment Variables (Vite uses import.meta.env)
 // ---------------------------------------------------------------------------
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const AI_BASE_URL = import.meta.env.VITE_AI_BASE_URL || '';
 const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA === 'true';
 
 // ---------------------------------------------------------------------------
@@ -35,6 +36,14 @@ const api = axios.create({
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
+
+const aiApi = AI_BASE_URL
+  ? axios.create({
+      baseURL: AI_BASE_URL,
+      timeout: 10000,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  : null;
 
 api.interceptors.request.use((config) => {
   const token = getStoredToken();
@@ -299,7 +308,10 @@ export async function fetchDietPlan(payload = {}) {
   }
 
   try {
-    const response = await api.post('/ml/diet-plan', payload);
+    const hasDietInputs = payload?.Age || payload?.age || payload?.BMI || payload?.bmi || payload?.ActivityLevel || payload?.activityLevel;
+    const response = aiApi && hasDietInputs
+      ? await aiApi.post('/diet/plan', payload)
+      : await api.post('/ml/diet-plan', payload);
     return response.data;
   } catch (error) {
     console.warn('[MaMa Care] Diet plan unavailable.', error.message);
@@ -317,7 +329,9 @@ export async function checkSymptoms(payload = {}) {
   }
 
   try {
-    const response = await api.post('/ml/symptom-check', payload);
+    const response = aiApi
+      ? await aiApi.post('/symptoms/analyze', payload)
+      : await api.post('/ml/symptom-check', payload);
     return response.data;
   } catch (error) {
     console.warn('[MaMa Care] Symptom check unavailable.', error.message);

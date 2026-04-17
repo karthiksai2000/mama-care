@@ -1,101 +1,152 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Apple, Coffee, Salad, Moon } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { fetchDietPlanByWeek } from '../services/api';
+import React, { useState } from 'react';
+import { fetchDietPlan } from '../services/api';
 
 const DietPlan = () => {
-  const { user } = useAuth();
-  const userWeek = user?.week || 24;
-  const trimester = userWeek <= 13 ? 1 : userWeek <= 27 ? 2 : 3;
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [aiForm, setAiForm] = useState({
+    age: '',
+    bmi: '',
+    activity: 'Moderate',
+    diabetes: 'No',
+    hypertension: 'No',
+  });
+  const [aiResult, setAiResult] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
 
-  useEffect(() => {
-    let active = true;
-    const loadPlan = async () => {
-      try {
-        const data = await fetchDietPlanByWeek({ trimester, week: userWeek });
-        if (active) setPlan(data.plan || null);
-      } catch (error) {
-        console.warn('[MaMa Care] Unable to load diet plan.', error?.message || error);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
+  const submitAI = async (event) => {
+    event.preventDefault();
+    setAiError('');
+    setAiResult(null);
 
-    loadPlan();
-    return () => {
-      active = false;
-    };
-  }, [trimester, userWeek]);
+    if (!aiForm.age || !aiForm.bmi || !aiForm.activity) {
+      setAiError('Age, BMI, and Activity Level are required.');
+      return;
+    }
 
-  const iconMap = useMemo(() => ({
-    breakfast: <Coffee size={20} />,
-    'mid-morning': <Apple size={20} />,
-    lunch: <Salad size={20} />,
-    dinner: <Moon size={20} />,
-  }), []);
+    setAiLoading(true);
+    try {
+      const payload = {
+        Age: Number(aiForm.age),
+        BMI: Number(aiForm.bmi),
+        ActivityLevel: aiForm.activity,
+        Diabetes: aiForm.diabetes,
+        Hypertension: aiForm.hypertension,
+      };
+      const data = await fetchDietPlan(payload);
+      setAiResult(data);
+    } catch (error) {
+      console.warn('[MaMa Care] AI diet plan unavailable.', error?.message || error);
+      setAiError('Unable to generate AI diet plan right now.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
-  const meals = plan?.meals || [];
+  const recommendedPlan =
+    aiResult?.RecommendedDietPlan || aiResult?.recommendedPlan || '—';
+  const probabilities =
+    aiResult?.Probabilities || aiResult?.probabilities || null;
+  const pregnancyFoods =
+    aiResult?.PregnancyFoods || aiResult?.pregnancyFoods || [];
 
   return (
     <div className="diet-page">
       <h2>Your Personalized Diet Plan 🥗</h2>
-      <p className="subtitle">Trimester {trimester} - Week {userWeek}</p>
+      <p className="subtitle">AI-based recommendation from your inputs</p>
 
-      <div className="meals-grid">
-        {loading && (
-          <motion.div className="meal-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="meal-header">
-              <Coffee size={20} />
-              <h4>Loading plan...</h4>
-            </div>
-          </motion.div>
+      <form className="diet-ai-form card" onSubmit={submitAI}>
+        <div className="diet-ai-grid">
+          <label>
+            Age
+            <input
+              type="number"
+              min="14"
+              max="60"
+              value={aiForm.age}
+              onChange={(event) => setAiForm((prev) => ({ ...prev, age: event.target.value }))}
+              placeholder="e.g. 26"
+              required
+            />
+          </label>
+          <label>
+            BMI
+            <input
+              type="number"
+              step="0.1"
+              min="14"
+              max="45"
+              value={aiForm.bmi}
+              onChange={(event) => setAiForm((prev) => ({ ...prev, bmi: event.target.value }))}
+              placeholder="e.g. 23.8"
+              required
+            />
+          </label>
+          <label>
+            Activity Level
+            <select
+              value={aiForm.activity}
+              onChange={(event) => setAiForm((prev) => ({ ...prev, activity: event.target.value }))}
+            >
+              <option>Sedentary</option>
+              <option>Light</option>
+              <option>Moderate</option>
+              <option>Active</option>
+            </select>
+          </label>
+          <label>
+            Diabetes
+            <select
+              value={aiForm.diabetes}
+              onChange={(event) => setAiForm((prev) => ({ ...prev, diabetes: event.target.value }))}
+            >
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </label>
+          <label>
+            Hypertension
+            <select
+              value={aiForm.hypertension}
+              onChange={(event) => setAiForm((prev) => ({ ...prev, hypertension: event.target.value }))}
+            >
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </label>
+        </div>
+
+        <button type="submit" className="diet-ai-btn">
+          {aiLoading ? 'Generating...' : 'Generate AI Diet Plan'}
+        </button>
+        {aiError && <p className="diet-ai-error">{aiError}</p>}
+      </form>
+
+      <div className="diet-ai-result card">
+        <h3>AI Recommendation</h3>
+        <p className="diet-ai-main">{recommendedPlan}</p>
+
+        {probabilities && (
+          <div className="diet-ai-probs">
+            {Object.entries(probabilities).map(([key, value]) => (
+              <div key={key} className="diet-ai-prob">
+                <span>{key}</span>
+                <span>{Math.round(value * 100)}%</span>
+              </div>
+            ))}
+          </div>
         )}
-        {!loading && meals.length === 0 && (
-          <motion.div className="meal-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="meal-header">
-              <Coffee size={20} />
-              <h4>No diet plan available yet.</h4>
-            </div>
-          </motion.div>
-        )}
-        {meals.map((meal, idx) => (
-          <motion.div
-            key={idx}
-            className="meal-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-          >
-            <div className="meal-header">
-              {iconMap[meal.time?.toLowerCase().includes('breakfast') ? 'breakfast'
-                : meal.time?.toLowerCase().includes('mid') ? 'mid-morning'
-                  : meal.time?.toLowerCase().includes('lunch') ? 'lunch' : 'dinner'] || <Coffee size={20} />}
-              <h4>{meal.time}</h4>
-            </div>
+
+        {pregnancyFoods.length > 0 && (
+          <div className="diet-ai-foods">
+            <h4>Pregnancy-Friendly Foods</h4>
             <ul>
-              {meal.items.map((item, i) => (
-                <li key={i}>{item}</li>
+              {pregnancyFoods.map((food) => (
+                <li key={food}>{food}</li>
               ))}
             </ul>
-          </motion.div>
-        ))}
-      </div>
-
-      <section className="nutrition-tips">
-        <h3>Nutrition Tips</h3>
-        {plan?.tips?.length ? (
-          <ul>
-            {plan.tips.map((tip, idx) => (
-              <li key={idx}>{tip}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No tips available yet.</p>
+          </div>
         )}
-      </section>
+      </div>
     </div>
   );
 };

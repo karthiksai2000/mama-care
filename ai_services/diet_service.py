@@ -14,6 +14,44 @@ DIABETES_CHOICES = ["Yes", "No"]
 HYPERTENSION_CHOICES = ["Yes", "No"]
 DIET_PLANS = ["Balanced", "Low-Carb", "Low-Fat", "High-Protein", "Keto"]
 
+PREGNANCY_FOODS = {
+    "Balanced": [
+        "Leafy greens (spinach, kale)",
+        "Lentils and beans",
+        "Greek yogurt",
+        "Salmon (low mercury)",
+        "Fortified whole grains",
+    ],
+    "Low-Carb": [
+        "Non-starchy vegetables",
+        "Eggs",
+        "Avocado",
+        "Nuts and seeds",
+        "Low-mercury fish",
+    ],
+    "Low-Fat": [
+        "Fruits and vegetables",
+        "Lean chicken or turkey",
+        "Whole grains",
+        "Low-fat dairy",
+        "Legumes",
+    ],
+    "High-Protein": [
+        "Lean meats",
+        "Eggs",
+        "Cottage cheese",
+        "Tofu",
+        "Chickpeas",
+    ],
+    "Keto": [
+        "Avocado",
+        "Eggs",
+        "Leafy greens",
+        "Olive oil",
+        "Cheese (pasteurized)",
+    ],
+}
+
 
 def assign_diet_plan(age, bmi, activity, diabetes, hypertension, noise_scale=0.25):
     activity = str(activity).strip().capitalize()
@@ -192,6 +230,7 @@ def predict_diet(payload):
     return {
         "RecommendedDietPlan": pred,
         "Probabilities": prob_map,
+        "PregnancyFoods": PREGNANCY_FOODS.get(pred, []),
         "ModelAccuracy": round(_accuracy, 4),
         "ClassificationReport": _report,
     }

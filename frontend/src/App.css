@@ -786,6 +786,92 @@ body {
   font-size: 0.95rem;
 }
 
+.diet-ai-form {
+  margin-bottom: 1.5rem;
+}
+
+.diet-ai-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.diet-ai-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.diet-ai-form input,
+.diet-ai-form select {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.diet-ai-btn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.diet-ai-error {
+  margin-top: 0.75rem;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.diet-ai-result {
+  margin-top: 1rem;
+}
+
+.diet-ai-main {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.diet-ai-probs {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.diet-ai-prob {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.diet-ai-foods {
+  margin-top: 1rem;
+}
+
+.diet-ai-foods h4 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.diet-ai-foods ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.diet-ai-foods li {
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
   .sidebar {
@@ -1840,6 +1926,20 @@ body {
 
 .symptom-analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.symptom-notes {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.symptom-notes textarea {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem;
+  background: var(--bg-card);
+}
+
 .symptom-badge {
   display: inline-flex;
   align-items: center;
@@ -1866,6 +1966,28 @@ body {
   border-radius: 8px;
   cursor: pointer;
   color: var(--text-muted);
+}
+
+.symptom-ai {
+  margin-top: 1rem;
+}
+
+.symptom-ai-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.symptom-ai-advice {
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.symptom-ai-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
 }
 
 /* ==========================================================================
