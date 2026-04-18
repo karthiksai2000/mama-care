@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, ThumbsUp, Send, Plus, X, Users } from 'lucide-react';
+import { MessageCircle, ThumbsUp, Send, Plus, X, Users, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +12,11 @@ const MOCK_POSTS = [
 ];
 
 const CATEGORIES = ['All', 'Tips', 'Question', 'Milestone', 'Diet', 'Support'];
+const TESTIMONIALS = [
+  { id: 1, name: 'Aanya', text: 'MaMa Care helped me feel seen every week. The reminders are gentle and spot on.' },
+  { id: 2, name: 'Rhea', text: 'The AI chat is calming and easy to trust when I am unsure.' },
+  { id: 3, name: 'Sanya', text: 'I love the community space. It feels warm and supportive.' },
+];
 
 const Community = () => {
   const { user } = useAuth();
@@ -19,6 +24,7 @@ const Community = () => {
   const [filter, setFilter] = useState('All');
   const [showNew, setShowNew] = useState(false);
   const [newPost, setNewPost] = useState({ content: '', category: 'Tips' });
+  const [anonymous, setAnonymous] = useState(false);
   const [commentText, setCommentText] = useState({});
   const [expandedComments, setExpandedComments] = useState({});
 
@@ -32,8 +38,9 @@ const Community = () => {
 
   const createPost = () => {
     if (!newPost.content.trim()) return;
-    setPosts(p => [{ id: Date.now(), author: user?.name || 'You', avatar: '🤰', time: 'Just now', category: newPost.category, content: newPost.content, likes: 0, comments: [] }, ...p]);
+    setPosts(p => [{ id: Date.now(), author: anonymous ? 'Anonymous' : (user?.name || 'You'), avatar: anonymous ? '🕊️' : '🤰', time: 'Just now', category: newPost.category, content: newPost.content, likes: 0, comments: [] }, ...p]);
     setNewPost({ content: '', category: 'Tips' });
+    setAnonymous(false);
     setShowNew(false);
   };
 
@@ -43,12 +50,26 @@ const Community = () => {
     <div className="community-page">
       <div className="community-header">
         <div>
-          <h2><Users size={24} /> Community Forum</h2>
-          <p className="subtitle">Connect with other mothers, share tips & experiences</p>
+          <h2><Users size={24} /> Community & Stories</h2>
+          <p className="subtitle">Connect with other mothers, share tips, and ask for support.</p>
         </div>
-        <button className="new-post-btn" onClick={() => setShowNew(!showNew)}>
-          {showNew ? <X size={18} /> : <Plus size={18} />} {showNew ? 'Cancel' : 'New Post'}
-        </button>
+        <div className="community-actions">
+          <button className="ghost-btn" onClick={() => { setShowNew(true); setAnonymous(true); }}>
+            <ShieldCheck size={16} /> Ask anonymously
+          </button>
+          <button className="new-post-btn" onClick={() => setShowNew(!showNew)}>
+            {showNew ? <X size={18} /> : <Plus size={18} />} {showNew ? 'Cancel' : 'New Post'}
+          </button>
+        </div>
+      </div>
+
+      <div className="community-stories">
+        {TESTIMONIALS.map((item) => (
+          <div key={item.id} className="story-card card">
+            <p>{item.text}</p>
+            <strong>— {item.name}</strong>
+          </div>
+        ))}
       </div>
 
       <AnimatePresence>
@@ -57,6 +78,10 @@ const Community = () => {
             <select value={newPost.category} onChange={e => setNewPost(p => ({ ...p, category: e.target.value }))}>
               {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c}>{c}</option>)}
             </select>
+            <label className="anon-toggle">
+              <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
+              Post anonymously
+            </label>
             <textarea placeholder="Share your thoughts, questions, or milestones..." value={newPost.content} onChange={e => setNewPost(p => ({ ...p, content: e.target.value }))} rows={3} />
             <button className="post-submit-btn" onClick={createPost} disabled={!newPost.content.trim()}>Post</button>
           </motion.div>

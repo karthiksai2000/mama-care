@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { uploadReport, analyzeReport } from '../services/api';
-import { UploadCloud, CheckCircle, FileText, Brain, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { uploadReport, analyzeReport, fetchReports, deleteReport } from '../services/api';
+import { UploadCloud, CheckCircle, FileText, Brain, AlertTriangle, TrendingUp, Loader2, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Reports = () => {
@@ -9,6 +9,34 @@ const Reports = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [aiResults, setAiResults] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [isLoadingReports, setIsLoadingReports] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const loadReports = async () => {
+      setIsLoadingReports(true);
+      try {
+        const data = await fetchReports();
+        if (!active) return;
+        const mapped = (data.reports || []).map((report) => ({
+          name: report.originalName,
+          date: report.createdAt ? new Date(report.createdAt).toLocaleDateString() : '',
+          size: report.size ? `${(report.size / 1024).toFixed(1)} KB` : '—',
+          id: report._id,
+        }));
+        setUploadedFiles(mapped);
+      } catch (error) {
+        console.warn('[MaMa Care] Unable to load reports.', error?.message || error);
+      } finally {
+        if (active) setIsLoadingReports(false);
+      }
+    };
+
+    loadReports();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleUpload = async () => {
     if (!file) return;
@@ -16,7 +44,22 @@ const Reports = () => {
     const res = await uploadReport(file);
     if (res.success) {
       setStatus('success');
-      setUploadedFiles(prev => [{ name: file.name, date: new Date().toLocaleDateString(), size: (file.size / 1024).toFixed(1) + ' KB' }, ...prev]);
+      try {
+        const data = await fetchReports();
+        const mapped = (data.reports || []).map((report) => ({
+          name: report.originalName,
+          date: report.createdAt ? new Date(report.createdAt).toLocaleDateString() : '',
+          size: report.size ? `${(report.size / 1024).toFixed(1)} KB` : '—',
+          id: report._id,
+        }));
+        setUploadedFiles(mapped);
+      } catch (error) {
+        setUploadedFiles((prev) => [{
+          name: file.name,
+          date: new Date().toLocaleDateString(),
+          size: `${(file.size / 1024).toFixed(1)} KB`,
+        }, ...prev]);
+      }
       setFile(null);
     } else {
       setStatus('error');
@@ -97,13 +140,36 @@ const Reports = () => {
         <div className="uploaded-list card">
           <h3>📋 Uploaded Files</h3>
           {uploadedFiles.map((f, i) => (
-            <div key={i} className="uploaded-item">
+            <div key={f.id || i} className="uploaded-item">
               <FileText size={16} />
               <span className="uf-name">{f.name}</span>
               <span className="uf-size">{f.size}</span>
               <span className="uf-date">{f.date}</span>
+              {f.id && (
+                <button
+                  className="ghost-btn"
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await deleteReport(f.id);
+                      setUploadedFiles((prev) => prev.filter((item) => item.id !== f.id));
+                    } catch (error) {
+                      console.warn('[MaMa Care] Unable to delete report.', error?.message || error);
+                    }
+                  }}
+                  aria-label="Delete report"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
             </div>
           ))}
+        </div>
+      )}
+      {uploadedFiles.length === 0 && isLoadingReports && (
+        <div className="uploaded-list card">
+          <h3>📋 Uploaded Files</h3>
+          <p className="subtitle">Loading reports...</p>
         </div>
       )}
     </div>

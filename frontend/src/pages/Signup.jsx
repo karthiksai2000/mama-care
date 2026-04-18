@@ -73,6 +73,12 @@ const Signup = () => {
           email: apiUser.email,
           week: apiUser.pregnancyWeek || apiUser.week,
           conditions: apiUser.conditions || [],
+          dueDate: apiUser.dueDate || null,
+          firstPregnancy: apiUser.firstPregnancy ?? null,
+          healthGoals: apiUser.healthGoals || [],
+          reminderPreferences: apiUser.reminderPreferences || [],
+          emotionalSupport: apiUser.emotionalSupport || [],
+          onboardingCompleted: apiUser.onboardingCompleted || false,
         },
       });
 
@@ -85,24 +91,32 @@ const Signup = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page premium-auth">
       <motion.div
         className="auth-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Left — Branding */}
         <div className="auth-brand">
           <div className="auth-brand-content">
-            <Heart size={40} fill="#FF69B4" stroke="#FF69B4" />
+            <Heart size={40} />
             <h2>MaMa Care</h2>
-            <p>Join thousands of mothers on a smarter, safer pregnancy journey powered by AI.</p>
-            <div className="auth-brand-features">
-              <div>✓ Free health tracking</div>
-              <div>✓ AI-powered guidance</div>
-              <div>✓ Personalized diet plans</div>
-              <div>✓ Risk alerts & reminders</div>
+            <p>Start a premium, calming pregnancy experience with trusted AI support.</p>
+            <div className="auth-visual-card">
+              <div>
+                <span>Onboarding</span>
+                <strong>5 steps to personalize care</strong>
+              </div>
+              <div className="auth-visual-progress">
+                <div className="progress-fill" style={{ width: '32%' }} />
+              </div>
+              <p>Set your goals and reminders in minutes</p>
+            </div>
+            <div className="auth-trust">
+              <span>HIPAA-ready</span>
+              <span>AI + clinician insights</span>
+              <span>24/7 support</span>
             </div>
           </div>
         </div>
@@ -110,8 +124,14 @@ const Signup = () => {
         {/* Right — Form */}
         <div className="auth-form-section">
           <div className="auth-form-header">
-            <h2>Create Account 🤰</h2>
-            <p>Start your maternal health journey</p>
+            <span className="auth-eyebrow">Step 1 of 2</span>
+            <h2>Create your account</h2>
+            <p>Set up your profile to unlock personalized guidance.</p>
+          </div>
+
+          <div className="auth-social">
+            <button type="button" className="social-btn">Sign up with Google</button>
+            <button type="button" className="social-btn">Sign up with Apple</button>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">

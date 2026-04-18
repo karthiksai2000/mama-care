@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import mongoose from 'mongoose';
 import { GridFSBucket } from 'mongodb';
 import Report from '../models/Report.js';
-import { optionalAuth } from '../middleware/auth.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ const upload = multer({
   limits: { fileSize: maxFileSizeBytes },
 });
 
-router.post('/upload', optionalAuth, upload.single('report'), async (req, res) => {
+router.post('/upload', requireAuth, upload.single('report'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'Missing report file.' });
   }
@@ -39,13 +39,13 @@ router.post('/upload', optionalAuth, upload.single('report'), async (req, res) =
     });
 
     const fileId = await new Promise((resolve, reject) => {
-      uploadStream.on('finish', (file) => resolve(file._id));
+      uploadStream.on('finish', () => resolve(uploadStream.id));
       uploadStream.on('error', reject);
       uploadStream.end(req.file.buffer);
     });
 
     const report = await Report.create({
-      userId: req.user?.id || null,
+      userId: req.user.id,
       fileId,
       filename: uniqueName,
       originalName: req.file.originalname,
@@ -62,6 +62,37 @@ router.post('/upload', optionalAuth, upload.single('report'), async (req, res) =
   } catch (error) {
     console.error('[MaMa Care] Report upload failed:', error);
     return res.status(500).json({ success: false, message: 'Upload failed.' });
+  }
+});
+
+router.get('/', requireAuth, async (req, res) => {
+  const reports = await Report.find({ userId: req.user.id })
+    .sort({ createdAt: -1 })
+    .select('originalName size contentType createdAt analysisStatus');
+
+  return res.json({ reports });
+});
+
+router.delete('/:id', requireAuth, async (req, res) => {
+  const report = await Report.findOne({ _id: req.params.id, userId: req.user.id });
+  if (!report) {
+    return res.status(404).json({ message: 'Report not found.' });
+  }
+
+  try {
+    const db = mongoose.connection.db;
+    if (!db) {
+      return res.status(500).json({ message: 'Database not ready.' });
+    }
+
+    const bucket = new GridFSBucket(db, { bucketName: 'reports' });
+    await bucket.delete(report.fileId);
+    await report.deleteOne();
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('[MaMa Care] Report delete failed:', error);
+    return res.status(500).json({ message: 'Failed to delete report.' });
   }
 });
 

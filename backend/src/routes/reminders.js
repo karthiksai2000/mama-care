@@ -11,10 +11,17 @@ router.post('/send', async (req, res) => {
   }
 
   try {
-    await sendEmail({
+    const info = await sendEmail({
       to: email,
       subject,
       text: message,
+    });
+
+    console.log('[MaMa Care] Reminder email sent:', {
+      to: email,
+      subject,
+      messageId: info?.messageId,
+      accepted: info?.accepted,
     });
 
     return res.json({ success: true, message: 'Reminder sent.' });

@@ -1,6 +1,9 @@
 import express from 'express';
 import Appointment from '../models/Appointment.js';
+import User from '../models/User.js';
 import { requireAuth } from '../middleware/auth.js';
+import { sendEmail } from '../services/emailService.js';
+import { buildAppointmentConfirmationEmail } from '../services/emailTemplates.js';
 
 const router = express.Router();
 
@@ -25,6 +28,33 @@ router.post('/', requireAuth, async (req, res) => {
     location: location || '',
     notes: notes || '',
   });
+
+  try {
+    const user = await User.findById(req.user.id).select('name email');
+    if (user?.email) {
+      const emailPayload = buildAppointmentConfirmationEmail({
+        name: user.name,
+        appointment,
+      });
+      const info = await sendEmail({
+        to: user.email,
+        subject: emailPayload.subject,
+        text: emailPayload.text,
+        html: emailPayload.html,
+      });
+
+      appointment.confirmationSentAt = new Date();
+      await appointment.save();
+
+      console.log('[MaMa Care] Appointment confirmation sent:', {
+        to: user.email,
+        messageId: info?.messageId,
+        appointmentId: appointment._id,
+      });
+    }
+  } catch (error) {
+    console.error('[MaMa Care] Appointment confirmation failed:', error);
+  }
 
   return res.status(201).json({ appointment });
 });

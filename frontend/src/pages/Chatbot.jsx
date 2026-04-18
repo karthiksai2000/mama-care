@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchChatHistory, sendChatMessage } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, UserRound, Sparkles } from 'lucide-react';
+import { Send, Bot, UserRound, Sparkles, Mic } from 'lucide-react';
 
 const getTime = () =>
   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -27,6 +27,12 @@ const Chatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
+  const suggestions = [
+    'What should I eat this week?',
+    'Is back pain normal in week 24?',
+    'Create a gentle sleep routine.',
+    'Breathing tips for stress relief.',
+  ];
 
   // Auto-scroll to the newest message
   const scrollToBottom = () =>
@@ -131,6 +137,17 @@ const Chatbot = () => {
         <div ref={chatEndRef} />
       </div>
 
+      <div className="chat-suggestions">
+        <span>Suggested prompts</span>
+        <div className="suggestion-row">
+          {suggestions.map((item) => (
+            <button key={item} type="button" onClick={() => setInput(item)}>
+              <Sparkles size={14} /> {item}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="chat-input">
         <input
           ref={inputRef}
@@ -140,6 +157,9 @@ const Chatbot = () => {
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           disabled={isTyping}
         />
+        <button className="chat-voice" type="button" aria-label="Voice input">
+          <Mic size={18} />
+        </button>
         <button onClick={handleSend} disabled={isTyping || !input.trim()}>
           <Send size={20} />
         </button>

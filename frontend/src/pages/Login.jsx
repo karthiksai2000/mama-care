@@ -41,6 +41,12 @@ const Login = () => {
           email: apiUser.email,
           week: apiUser.pregnancyWeek || apiUser.week,
           conditions: apiUser.conditions || [],
+          dueDate: apiUser.dueDate || null,
+          firstPregnancy: apiUser.firstPregnancy ?? null,
+          healthGoals: apiUser.healthGoals || [],
+          reminderPreferences: apiUser.reminderPreferences || [],
+          emotionalSupport: apiUser.emotionalSupport || [],
+          onboardingCompleted: apiUser.onboardingCompleted || false,
         },
       });
 
@@ -53,22 +59,32 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page premium-auth">
       <motion.div
         className="auth-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Left — Branding Panel */}
         <div className="auth-brand">
           <div className="auth-brand-content">
-            <Heart size={40} fill="#FF69B4" stroke="#FF69B4" />
+            <Heart size={40} />
             <h2>MaMa Care</h2>
-            <p>Your smart maternal health companion. Track, chat, and stay healthy throughout your pregnancy.</p>
-            <div className="auth-brand-stats">
-              <div><strong>10K+</strong><span>Mothers</span></div>
-              <div><strong>99%</strong><span>Satisfaction</span></div>
+            <p>AI pregnancy guidance designed to feel calm, beautiful, and reassuring.</p>
+            <div className="auth-visual-card">
+              <div>
+                <span>Week 18</span>
+                <strong>Baby growth is on track</strong>
+              </div>
+              <div className="auth-visual-progress">
+                <div className="progress-fill" style={{ width: '68%' }} />
+              </div>
+              <p>Next appointment in 3 days</p>
+            </div>
+            <div className="auth-trust">
+              <span>Private & secure</span>
+              <span>Clinician reviewed</span>
+              <span>Trusted by moms</span>
             </div>
           </div>
         </div>
@@ -76,8 +92,14 @@ const Login = () => {
         {/* Right — Form */}
         <div className="auth-form-section">
           <div className="auth-form-header">
-            <h2>Welcome Back 👋</h2>
-            <p>Sign in to continue your journey</p>
+            <span className="auth-eyebrow">Welcome back</span>
+            <h2>Sign in to continue</h2>
+            <p>Pick up right where you left off in your journey.</p>
+          </div>
+
+          <div className="auth-social">
+            <button type="button" className="social-btn">Continue with Google</button>
+            <button type="button" className="social-btn">Continue with Apple</button>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { CalendarDays, Plus, Clock, User, Trash2, MapPin, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchAppointments, addAppointment, deleteAppointment } from '../services/api';
@@ -60,6 +60,20 @@ const Appointments = () => {
     .filter(a => new Date(a.date) < now)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
+  const calendar = useMemo(() => {
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < firstDay; i += 1) cells.push(null);
+    for (let day = 1; day <= daysInMonth; day += 1) cells.push(day);
+    while (cells.length % 7 !== 0) cells.push(null);
+
+    const apptDays = new Set(appts.map((a) => new Date(a.date).getDate()));
+    return { year, month, cells, apptDays };
+  }, [appts, now]);
+
   const ApptCard = ({ a, isPast }) => (
     <motion.div className={`appt-card card ${isPast ? 'past' : ''}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <div className="appt-date-badge">
@@ -87,6 +101,44 @@ const Appointments = () => {
         <button className="appt-add-btn" onClick={() => setShowForm(!showForm)}>
           <Plus size={18} /> New Appointment
         </button>
+      </div>
+
+      <div className="appt-grid">
+        <div className="appt-calendar card">
+          <div className="calendar-header">
+            <h3>Calendar</h3>
+            <span>{now.toLocaleDateString('en', { month: 'long', year: 'numeric' })}</span>
+          </div>
+          <div className="calendar-week">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <span key={day}>{day}</span>
+            ))}
+          </div>
+          <div className="calendar-grid">
+            {calendar.cells.map((cell, idx) => (
+              <div key={idx} className={`calendar-cell ${cell ? '' : 'empty'} ${cell && calendar.apptDays.has(cell) ? 'has-appt' : ''} ${cell === now.getDate() ? 'today' : ''}`}>
+                {cell || ''}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="appt-reminders card">
+          <h3>Upcoming reminders</h3>
+          <div className="reminder-row">
+            <span>Vaccines</span>
+            <strong>Tetanus booster · Week 28</strong>
+          </div>
+          <div className="reminder-row">
+            <span>Scan</span>
+            <strong>Growth scan · Week 32</strong>
+          </div>
+          <div className="reminder-row">
+            <span>Check-in</span>
+            <strong>Blood pressure review · 2 weeks</strong>
+          </div>
+          <button className="ghost-btn" type="button">Add reminder</button>
+        </div>
       </div>
 
       <AnimatePresence>

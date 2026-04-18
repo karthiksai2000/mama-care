@@ -9,6 +9,10 @@ const appointmentSchema = new mongoose.Schema(
     type: { type: String, required: true },
     location: { type: String, default: '' },
     notes: { type: String, default: '' },
+    reminderSentAt: { type: Date, default: null },
+    confirmationSentAt: { type: Date, default: null },
+    reminder30SentAt: { type: Date, default: null },
+    reminderAtSentAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

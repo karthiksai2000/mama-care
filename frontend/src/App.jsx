@@ -22,6 +22,10 @@ import BabyGrowth from './pages/BabyGrowth';
 import Appointments from './pages/Appointments';
 import Community from './pages/Community';
 import PartnerPortal from './pages/PartnerPortal';
+import Onboarding from './pages/Onboarding';
+import WeeklyJourney from './pages/WeeklyJourney';
+import HealthTracker from './pages/HealthTracker';
+import Settings from './pages/Settings';
 import './App.css';
 
 function App() {
@@ -55,9 +59,13 @@ function App() {
                 <Route path="/weight-tracker" element={<WeightTracker />} />
                 <Route path="/symptom-checker" element={<SymptomChecker />} />
                 <Route path="/baby-growth" element={<BabyGrowth />} />
+                <Route path="/weekly-journey" element={<WeeklyJourney />} />
                 <Route path="/appointments" element={<Appointments />} />
+                <Route path="/health-tracker" element={<HealthTracker />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/partner-portal" element={<PartnerPortal />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/settings" element={<Settings />} />
               </Route>
             </Routes>
           </BrowserRouter>

@@ -18,6 +18,12 @@ const Profile = () => {
     navigate('/login');
   };
 
+  const dueDateValue = authUser?.dueDate || health?.user?.dueDate || null;
+  const dueDateObj = dueDateValue ? new Date(dueDateValue) : null;
+  const dueDateLabel = dueDateObj && !Number.isNaN(dueDateObj.getTime())
+    ? dueDateObj.toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' })
+    : 'Not set';
+
   return (
     <div className="profile-page">
       <h2>Your Profile</h2>
@@ -29,6 +35,7 @@ const Profile = () => {
         <div className="profile-details">
           <p><User size={16} /> <strong>Name:</strong> {authUser?.name || 'User'}</p>
           <p><Mail size={16} /> <strong>Email:</strong> {authUser?.email || '—'}</p>
+          <p><Calendar size={16} /> <strong>Due Date:</strong> {dueDateLabel}</p>
           <p><Calendar size={16} /> <strong>Pregnancy Week:</strong> {authUser?.week || health?.user?.week || '—'}</p>
           <p><Activity size={16} /> <strong>Risk Level:</strong> {health?.user?.risk || 'Calculating...'}</p>
         </div>

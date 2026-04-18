@@ -34,8 +34,14 @@ const PartnerPortal = () => {
 
   const week = user?.week || data?.user?.week || 24;
   const trimester = week <= 13 ? '1st' : week <= 27 ? '2nd' : '3rd';
-  const dueDate = user?.lmp ? new Date(new Date(user.lmp).getTime() + 280 * 86400000).toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Not set';
-  const daysLeft = user?.lmp ? Math.max(0, Math.ceil((new Date(user.lmp).getTime() + 280 * 86400000 - Date.now()) / 86400000)) : '—';
+  const dueDateValue = user?.dueDate || data?.user?.dueDate || null;
+  const dueDateObj = dueDateValue ? new Date(dueDateValue) : null;
+  const dueDate = dueDateObj && !Number.isNaN(dueDateObj.getTime())
+    ? dueDateObj.toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' })
+    : 'Not set';
+  const daysLeft = dueDateObj && !Number.isNaN(dueDateObj.getTime())
+    ? Math.max(0, Math.ceil((dueDateObj.getTime() - Date.now()) / 86400000))
+    : '—';
   const sizeMatch = growth.reduce((best, item, index) => {
     if (!growth.length) return 0;
     return Math.abs(item.week - week) < Math.abs(growth[best].week - week) ? index : best;

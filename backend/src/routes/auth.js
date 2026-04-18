@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Reminder from '../models/Reminder.js';
 import { requireAuth } from '../middleware/auth.js';
+import { sendEmail } from '../services/emailService.js';
+import { buildWelcomeEmail } from '../services/emailTemplates.js';
 
 const router = express.Router();
 
@@ -55,6 +57,18 @@ router.post('/register', async (req, res) => {
     );
 
     const token = createToken(user);
+
+    try {
+      const welcome = buildWelcomeEmail({ name: user.name });
+      await sendEmail({
+        to: user.email,
+        subject: welcome.subject,
+        text: welcome.text,
+        html: welcome.html,
+      });
+    } catch (emailError) {
+      console.warn('[MaMa Care] Welcome email failed:', emailError?.message || emailError);
+    }
     return res.json({
       token,
       user: {
@@ -63,6 +77,12 @@ router.post('/register', async (req, res) => {
         email: user.email,
         pregnancyWeek: user.pregnancyWeek,
         conditions: user.conditions,
+        dueDate: user.dueDate,
+        firstPregnancy: user.firstPregnancy,
+        healthGoals: user.healthGoals,
+        reminderPreferences: user.reminderPreferences,
+        emotionalSupport: user.emotionalSupport,
+        onboardingCompleted: user.onboardingCompleted,
       },
     });
   } catch (error) {
@@ -98,6 +118,12 @@ router.post('/login', async (req, res) => {
         email: user.email,
         pregnancyWeek: user.pregnancyWeek,
         conditions: user.conditions,
+        dueDate: user.dueDate,
+        firstPregnancy: user.firstPregnancy,
+        healthGoals: user.healthGoals,
+        reminderPreferences: user.reminderPreferences,
+        emotionalSupport: user.emotionalSupport,
+        onboardingCompleted: user.onboardingCompleted,
       },
     });
   } catch (error) {
@@ -112,6 +138,41 @@ router.get('/me', requireAuth, async (req, res) => {
     return res.status(404).json({ message: 'User not found.' });
   }
   return res.json({ user });
+});
+
+router.post('/onboarding', requireAuth, async (req, res) => {
+  try {
+    const { dueDate, firstPregnancy, goals, reminders, emotional } = req.body;
+
+    const updates = {};
+
+    if (dueDate !== undefined) {
+      updates.dueDate = dueDate ? new Date(dueDate) : null;
+    }
+
+    if (firstPregnancy !== undefined) {
+      if (firstPregnancy === 'yes') updates.firstPregnancy = true;
+      else if (firstPregnancy === 'no') updates.firstPregnancy = false;
+      else if (typeof firstPregnancy === 'boolean') updates.firstPregnancy = firstPregnancy;
+    }
+
+    if (Array.isArray(goals)) updates.healthGoals = goals;
+    if (Array.isArray(reminders)) updates.reminderPreferences = reminders;
+    if (Array.isArray(emotional)) updates.emotionalSupport = emotional;
+
+    updates.onboardingCompleted = true;
+    updates.onboardingCompletedAt = new Date();
+
+    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-passwordHash');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    return res.json({ user });
+  } catch (error) {
+    console.error('[MaMa Care] Onboarding update failed:', error);
+    return res.status(500).json({ message: 'Unable to save onboarding data.' });
+  }
 });
 
 export default router;

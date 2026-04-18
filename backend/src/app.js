@@ -14,6 +14,7 @@ import dietPlanRoutes from './routes/diet-plans.js';
 import symptomRoutes from './routes/symptoms.js';
 import riskRoutes from './routes/risk.js';
 import chatRoutes from './routes/chat.js';
+import healthTrackerRoutes from './routes/health-tracker.js';
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/diet-plans', dietPlanRoutes);
 app.use('/api/symptoms', symptomRoutes);
 app.use('/api/risk', riskRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/health-tracker', healthTrackerRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

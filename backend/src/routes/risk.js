@@ -2,6 +2,9 @@ import express from 'express';
 import RiskFactor from '../models/RiskFactor.js';
 import RiskAssessment from '../models/RiskAssessment.js';
 import { requireAuth } from '../middleware/auth.js';
+import User from '../models/User.js';
+import { sendEmail } from '../services/emailService.js';
+import { buildRiskAlertEmail } from '../services/emailTemplates.js';
 
 const router = express.Router();
 
@@ -115,6 +118,36 @@ router.post('/assess', requireAuth, async (req, res) => {
     factors: factors || [],
     recommendations,
   });
+
+  if (['medium', 'high'].includes(assessment.level)) {
+    try {
+      const user = await User.findById(req.user.id).select('name email');
+      if (user?.email) {
+        const emailPayload = buildRiskAlertEmail({
+          name: user.name,
+          level: assessment.level,
+          recommendations,
+        });
+        const info = await sendEmail({
+          to: user.email,
+          subject: emailPayload.subject,
+          text: emailPayload.text,
+          html: emailPayload.html,
+        });
+
+        record.alertSentAt = new Date();
+        await record.save();
+
+        console.log('[MaMa Care] Risk alert email sent:', {
+          to: user.email,
+          level: assessment.level,
+          messageId: info?.messageId,
+        });
+      }
+    } catch (error) {
+      console.error('[MaMa Care] Risk alert email failed:', error);
+    }
+  }
 
   return res.json({
     assessment: {

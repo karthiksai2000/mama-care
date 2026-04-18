@@ -16,6 +16,7 @@ const riskAssessmentSchema = new mongoose.Schema(
     },
     factors: { type: [String], default: [] },
     recommendations: { type: [String], default: [] },
+    alertSentAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

@@ -114,6 +114,11 @@ export async function loginUser(payload) {
   return response.data;
 }
 
+export async function saveOnboarding(payload) {
+  const response = await api.post('/auth/onboarding', payload);
+  return response.data;
+}
+
 export async function fetchWeightEntries() {
   const response = await api.get('/weight');
   return response.data;
@@ -234,6 +239,16 @@ export async function fetchChatHistory() {
   return response.data;
 }
 
+export async function fetchHealthEntries() {
+  const response = await api.get('/health-tracker/entries');
+  return response.data;
+}
+
+export async function addHealthEntry(payload) {
+  const response = await api.post('/health-tracker/entries', payload);
+  return response.data;
+}
+
 /**
  * Fetch dashboard data (user info, health trends, reminders, chat history).
  */
@@ -278,6 +293,16 @@ export async function uploadReport(file) {
     console.warn('[MaMa Care] Upload failed.', error.message);
     return { success: false, message: 'Upload failed. Please try again.' };
   }
+}
+
+export async function fetchReports() {
+  const response = await api.get('/reports');
+  return response.data;
+}
+
+export async function deleteReport(id) {
+  const response = await api.delete(`/reports/${id}`);
+  return response.data;
 }
 
 /**

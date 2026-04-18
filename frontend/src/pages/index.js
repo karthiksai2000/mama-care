@@ -14,3 +14,7 @@ export { default as BabyGrowth } from './BabyGrowth';
 export { default as Appointments } from './Appointments';
 export { default as Community } from './Community';
 export { default as PartnerPortal } from './PartnerPortal';
+export { default as Onboarding } from './Onboarding';
+export { default as WeeklyJourney } from './WeeklyJourney';
+export { default as HealthTracker } from './HealthTracker';
+export { default as Settings } from './Settings';

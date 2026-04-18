@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, MessageSquareHeart, FileHeart, Utensils, Baby, Timer, Calculator, Scale, Stethoscope, Apple, CalendarDays, Users, Share2, Sun, Moon, Globe } from 'lucide-react';
+import { LayoutDashboard, MessageSquareHeart, FileHeart, Utensils, Baby, Timer, Calculator, Scale, Stethoscope, Apple, CalendarDays, Users, Share2, Sun, Moon, Globe, Sparkles, HeartPulse, Settings as SettingsIcon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -14,11 +14,13 @@ const Sidebar = ({ isOpen }) => {
       links: [
         { to: '/dashboard', label: t('dashboard'), icon: <LayoutDashboard size={18} /> },
         { to: '/chatbot', label: t('chatbot'), icon: <MessageSquareHeart size={18} /> },
+        { to: '/onboarding', label: 'Onboarding', icon: <Sparkles size={18} /> },
       ],
     },
     {
       title: t('healthTools'),
       links: [
+        { to: '/health-tracker', label: 'Health Tracker', icon: <HeartPulse size={18} /> },
         { to: '/kick-counter', label: t('kickCounter'), icon: <Baby size={18} /> },
         { to: '/contraction-timer', label: t('contractionTimer'), icon: <Timer size={18} /> },
         { to: '/risk-calculator', label: t('riskCalc'), icon: <Calculator size={18} /> },
@@ -30,6 +32,7 @@ const Sidebar = ({ isOpen }) => {
       title: t('babyNutrition'),
       links: [
         { to: '/baby-growth', label: t('babyGrowth'), icon: <Apple size={18} /> },
+        { to: '/weekly-journey', label: 'Weekly Journey', icon: <Baby size={18} /> },
         { to: '/diet', label: t('diet'), icon: <Utensils size={18} /> },
       ],
     },
@@ -45,6 +48,12 @@ const Sidebar = ({ isOpen }) => {
       links: [
         { to: '/community', label: t('community'), icon: <Users size={18} /> },
         { to: '/partner-portal', label: t('partner'), icon: <Share2 size={18} /> },
+      ],
+    },
+    {
+      title: 'Preferences',
+      links: [
+        { to: '/settings', label: 'Settings', icon: <SettingsIcon size={18} /> },
       ],
     },
   ];
