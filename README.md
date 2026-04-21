@@ -20,7 +20,7 @@
 
 <!-- Optional dynamic stats -->
 <a href="#"><img src="https://github-readme-stats.vercel.app/api?username=karthiksai2000&show_icons=true&theme=tokyonight" height="140"/></a>
-<a href="#"><img src="https://streak-stats.demolab.com/?user=your-karthiksai2000&theme=tokyonight" height="140"/></a>
+<a href="#"><img src="https://streak-stats.demolab.com/?user=karthiksai2000&theme=tokyonight" height="140"/></a>
 
 </div>
 
