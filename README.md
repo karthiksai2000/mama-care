@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://via.placeholder.com/1400x420/0b0f1a/8be9fd?text=MaMa+Care+%E2%80%A2+Maternal+Health+Platform" alt="MaMa Care Banner" width="100%" />
+
 
 # MaMa Care
 **AI-powered maternal health platform for personalized care, proactive risk insights, and a calmer pregnancy journey.**
@@ -19,8 +19,8 @@
 <br/><br/>
 
 <!-- Optional dynamic stats -->
-<a href="#"><img src="https://github-readme-stats.vercel.app/api?username=your-username&show_icons=true&theme=tokyonight" height="140"/></a>
-<a href="#"><img src="https://streak-stats.demolab.com/?user=your-username&theme=tokyonight" height="140"/></a>
+<a href="#"><img src="https://github-readme-stats.vercel.app/api?username=karthiksai2000&show_icons=true&theme=tokyonight" height="140"/></a>
+<a href="#"><img src="https://streak-stats.demolab.com/?user=your-karthiksai2000&theme=tokyonight" height="140"/></a>
 
 </div>
 
@@ -197,7 +197,7 @@ mama-care/
 
 ## Screenshot
 <div align="center">
-<img src="https://via.placeholder.com/900x520/0b0f1a/8be9fd?text=Home+Page" width="90%" style="border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.35);" />
+<img src="home.png" width="90%" style="border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.35);" />
 </div>
 
 ---
