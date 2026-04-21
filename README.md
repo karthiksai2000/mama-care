@@ -195,21 +195,12 @@ mama-care/
 
 ---
 
-## Screenshots (Glassmorphism)
-> Add your UI shots here for maximum impact:
-
+## Screenshot
 <div align="center">
-<img src="https://via.placeholder.com/900x520/0b0f1a/8be9fd?text=Dashboard+Preview" width="90%" style="border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.35);" />
+<img src="https://via.placeholder.com/900x520/0b0f1a/8be9fd?text=Home+Page" width="90%" style="border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.35);" />
 </div>
 
 ---
 
 ## License
 MIT - build responsibly and care for patients.
-
----
-
-### Pro Tips for Visual Impact
-- Replace the banner with a custom brand image matching your palette.
-- Use real product screenshots with soft shadows.
-- Keep the README aligned with your UI design system.
